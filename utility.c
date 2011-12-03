@@ -4,23 +4,13 @@
 #include <string.h>
 #include "utility.h"
 
-/*
-int round(float r)
-{
-    return (r > 0.0) ? floor(r + 0.5) : ceil(r - 0.5);
-}
-*/
-
-//generate an integer from [a, b]
 int rnd(int a, int b)
 {
 	int ans = 0;
-	//ans=(int)(rand() * (b - a + 1) / (1.0 * RAND_MAX) + a);
 	ans = rand() % (b - a + 1) + a;
 	return ans;
 }
 
-//given n, return a permutation of 0:n-1 in random order
 int* randperm(int n)
 {
 	int* perm = (int*) calloc(n, sizeof(int));
