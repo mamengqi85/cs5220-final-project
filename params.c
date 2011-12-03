@@ -20,12 +20,12 @@ static void default_params(param_t* params)
 
 static void set_io(param_t* params)
 {	
-	sprintf(params->in_clauses, "uf200/uf200-%d.txt", ord);
-	sprintf(params->out_best_cost, "uf200_best_cost_%d.txt", ord);
-	sprintf(params->out_avg_fun_eval, "uf200_avg_best_cost_func_eval_%d.txt". ord);
-	sprintf(params->out_min_hit, "min_hit_%d.txt", ord);
-	sprintf(params->out_cpu_time, "cpu_time_%d.txt", ord);
-	sprintf(params->out_best_sol, "best_sol_%d.txt", ord);
+	sprintf(params->in_clauses, "uf200/uf200-%d.txt", params->ord);
+	sprintf(params->out_best_cost, "uf200_best_cost_%d.txt", params->ord);
+	sprintf(params->out_avg_fun_eval, "uf200_avg_best_cost_func_eval_%d.txt", params->ord);
+	sprintf(params->out_min_hit, "min_hit_%d.txt", params->ord);
+	sprintf(params->out_cpu_time, "cpu_time_%d.txt", params->ord);
+	sprintf(params->out_best_sol, "best_sol_%d.txt", params->ord);
 }
 
 
@@ -33,7 +33,7 @@ static void print_usage()
 {
 	param_t params;
 	default_params(&params);
-	fprintf(stdewrr, 
+	fprintf(stderr, 
 			"nbody\n"
 			"\t-h: print this message\n"
 			"\t-t: number of trials (%d)\n"
@@ -46,10 +46,10 @@ static void print_usage()
 			"\t-m: probability of mutation at the end (%g)\n"
 			"\t-E: size of elites to bring to next generation at the beginning (%d)\n"
 			"\t-e: size of elites to bring to next generation at the end (%d)\n"
-			"\t-o: ordinary of the input clauses file (%d)\n"
-			params.trials, params.popsize, params.maxGen, params.nCrossover
+			"\t-o: ordinary of the input clauses file (%d)\n",
+			params.trails, params.popsize, params.maxGen, params.nCrossover,
 			params.pCrossover_s, params.pCrossover_e, params.pMutation_s, 
-			params.pMutation_e, params.elitesize_s, params.elitesize_e
+			params.pMutation_e, params.elitesize_s, params.elitesize_e,
 			params.ord);
 }
 
@@ -78,8 +78,8 @@ int set_params(int argc, char** argv, param_t* params)
         get_flt_arg('c', pCrossover_e);
         get_flt_arg('M', pMutation_s);
         get_flt_arg('m', pMutation_e);
-        get_flt_arg('E', elite_size_s);
-        get_flt_arg('e', elite_size_e);
+        get_flt_arg('E', elitesize_s);
+        get_flt_arg('e', elitesize_e);
         get_flt_arg('o', ord);
         default:
             fprintf(stderr, "Unknown option\n");

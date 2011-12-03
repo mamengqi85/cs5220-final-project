@@ -9,6 +9,8 @@ typedef struct record_t{
 	int* sbest;			/* current best solution				*/
 } record_t;
 
+record_t* alloc_record(params_t* params);
+free_record(record_t* r);
 void recorder(param_t* params, int* max_fitness, int** offspring, record_t* records);
 
 #endif /* RECORD_H */

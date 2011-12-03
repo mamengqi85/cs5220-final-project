@@ -10,14 +10,21 @@ typedef struct param_t {
 	float pCrossover_s;	/* starting probability of crossover		*/
 	float pCrossover_e;	/* ending probability of crossover			*/
 	float pMutation_s;	/* starting probability of mutation			*/
-	float pMutation_s;	/* ending probability of mutation			*/
-	int elite_size_s;	/* starting number of elites				*/
-	int elite_size_e;	/* ending number of elites					*/
+	float pMutation_e;	/* ending probability of mutation			*/
+	int elitesize_s;	/* starting number of elites				*/
+	int elitesize_e;	/* ending number of elites					*/
 	int ord;			/* ordinary of the test set					*/
 
 	int** clauses;		/* clauses to satisfy						*/
 	int** n_sat;		/* number of decision valuables in a clause	*/
 	int** n_clauses;	/* number of clauses in to formula			*/
+
+	char* in_clauses;
+	char* out_best_cost;
+	char* out_avg_fun_eval;
+	char* out_min_hit;
+	char* out_cpu_time;
+	char* out_best_sol;
 } param_t;
 
 int set_params(int argc, char** argv, param_t* params);
