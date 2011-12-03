@@ -4,7 +4,7 @@
 
 record_t* alloc_record(params_t* params)
 {
-	record_t* r = (record_t*) calloc(1, sizeof(record_t));
+	record_t* record = (record_t*) calloc(1, sizeof(record_t));
 	record->allcost = (int**) calloc(params->popsize * params->maxGen, sizeof(int));
 	record->bestcost = (int*) calloc(params->maxGen, sizeof(int));
 	record->meancost = (int*) calloc(params->maxGen, sizeof(int));
