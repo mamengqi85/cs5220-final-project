@@ -5,12 +5,17 @@
 record_t* alloc_record(params_t* params)
 {
 	record_t* record = (record_t*) calloc(1, sizeof(record_t));
-	record->allcost = (int**) calloc(params->popsize * params->maxGen, sizeof(int));
+
+	record->allcost = (int**) calloc(params->maxGen, sizeof(int*));
+	int i;
+	for (i= 0; i < params->maxGen; ++i) {
+		record->allcost[i] = (int*) calloc(params->popsize, sizeof(int));
+	}
+
 	record->bestcost = (int*) calloc(params->maxGen, sizeof(int));
 	record->meancost = (int*) calloc(params->maxGen, sizeof(int));
-	record->stdcost = (int*) calloc(params->maxGen, sizeof(int));
 	record->sbest = (int*) calloc(params->len, sizeof(int));
-	return r;
+	return record;
 }
 
 void free_record(record_t* r)
