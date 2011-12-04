@@ -120,3 +120,29 @@ int* sort(int* array, int size)
 	quicksort(array, 0, size - 1, order);
 	return order;
 }
+
+void print_matrix(int** matrix, int row, int col, char* fname)
+{
+	FILE* fp = fopen(fname, "w");
+	int i, j;
+	for (i = 0; i < row; ++i) {
+		for (j = 0; j < col; ++j) {
+			fprintf(fp, "%d\t", matrix[i][j]);
+		}
+		fprintf(fp, "\n");
+	}
+	fclose(fp);
+}
+
+void print_matrixf(float** matrix, int row, int col, char* fname)
+{
+	FILE* fp = fopen(fname, "w");
+	int i, j;
+	for (i = 0; i < row; ++i) {
+		for (j = 0; j < col; ++j) {
+			fprintf(fp, "%f\t", matrix[i][j]);
+		}
+		fprintf(fp, "\n");
+	}
+	fclose(fp);
+}

@@ -20,4 +20,8 @@ float mean(int* array, int size);
 //sort the array by ascending order. return the original index after sorted.
 int* sort(int* array, int size);
 
+//output the matrix to a specific file
+void print_matrix(int** matrix, int row, int col, char* fname);
+void print_matrixf(float** matrix, int row, int col, char* fname);
+
 #endif /* UTILITY */

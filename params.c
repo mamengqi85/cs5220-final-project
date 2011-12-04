@@ -1,10 +1,49 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "params.h"
+
+param_t* alloc_param()
+{
+	int fname_len = 100;
+	param_t* params = (param_t*) calloc(1, sizeof(param_t));
+	params->n_sat = 3;
+	params->n_clauses = 860;
+	params->clauses = (int**) calloc(params->n_clauses, sizeof(int*));
+	int i;
+	for (i = 0; i < params->n_clauses; ++i) {
+		(params->clauses)[i] = (int*) calloc(params->n_sat, sizeof(int));
+	}
+	params->in_clauses = (char*) calloc(fname_len, sizeof(char));
+	params->out_best_cost = (char*) calloc(fname_len, sizeof(char));
+	params->out_avg_fun_eval = (char*) calloc(fname_len, sizeof(char));
+	params->out_min_hit = (char*) calloc(fname_len, sizeof(char));
+	params->out_cpu_time = (char*) calloc(fname_len, sizeof(char));
+	params->out_best_sol = (char*) calloc(fname_len, sizeof(char));
+	params->out_fittest = (char*) calloc(fname_len, sizeof(char));
+
+	return params;
+}
+
+void free_param(param_t* params)
+{
+	int i;
+	for (i = 0; i < params->n_clauses; ++i) {
+		free(params->clauses[i]);
+	}
+	free(params->in_clauses);
+	free(params->out_best_cost);
+	free(params->out_avg_fun_eval);
+	free(params->out_min_hit);
+	free(params->out_cpu_time);
+	free(params->out_best_sol);
+	free(params->out_fittest);
+	free(params);
+}
 
 static void default_params(param_t* params)
 {
-	params->trails		= 30;
+	params->trials		= 30;
 	params->len			= 200;
 	params->popsize		= 20;
 	params->maxGen		= 50;
@@ -16,16 +55,18 @@ static void default_params(param_t* params)
 	params->elitesize_s	= 1;
 	params->elitesize_e	= 15;
 	params->ord = 1;
+
 }
 
 static void set_io(param_t* params)
 {	
-	sprintf(params->in_clauses, "uf200/uf200-%d.txt", params->ord);
-	sprintf(params->out_best_cost, "uf200_best_cost_%d.txt", params->ord);
-	sprintf(params->out_avg_fun_eval, "uf200_avg_best_cost_func_eval_%d.txt", params->ord);
-	sprintf(params->out_min_hit, "min_hit_%d.txt", params->ord);
-	sprintf(params->out_cpu_time, "cpu_time_%d.txt", params->ord);
-	sprintf(params->out_best_sol, "best_sol_%d.txt", params->ord);
+	sprintf(params->in_clauses, "../uf200/uf200-0%d.txt", params->ord);
+	sprintf(params->out_best_cost, "../result/uf200_best_cost_0%d.txt", params->ord);
+	sprintf(params->out_avg_fun_eval, "../result/uf200_avg_best_cost_func_eval_0%d.txt", params->ord);
+	sprintf(params->out_min_hit, "../result/min_hit_0%d.txt", params->ord);
+	sprintf(params->out_cpu_time, "../result/cpu_time_0%d.txt", params->ord);
+	sprintf(params->out_best_sol, "../result/best_sol_0%d.txt", params->ord);
+	sprintf(params->out_fittest, "../result/fittest_0%d.txt", params->ord);
 }
 
 
@@ -47,7 +88,7 @@ static void print_usage()
 			"\t-E: size of elites to bring to next generation at the beginning (%d)\n"
 			"\t-e: size of elites to bring to next generation at the end (%d)\n"
 			"\t-o: ordinary of the input clauses file (%d)\n",
-			params.trails, params.popsize, params.maxGen, params.nCrossover,
+			params.trials, params.popsize, params.maxGen, params.nCrossover,
 			params.pCrossover_s, params.pCrossover_e, params.pMutation_s, 
 			params.pMutation_e, params.elitesize_s, params.elitesize_e,
 			params.ord);
@@ -70,7 +111,7 @@ int set_params(int argc, char** argv, param_t* params)
         case 'h': 
             print_usage(); 
             return -1;
-        get_int_arg('t', trails);
+        get_int_arg('t', trials);
         get_int_arg('p', popsize);
         get_flt_arg('g', maxGen);
         get_flt_arg('n', nCrossover);

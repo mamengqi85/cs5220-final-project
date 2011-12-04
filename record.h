@@ -1,16 +1,18 @@
 #ifndef RECORD_H
 #define RECORD_H
 
+#include "params.h"
+
 typedef struct record_t{
 	int* allcost;		/* cost of the whole population			*/
 	int* bestcost;		/* best cost in the population			*/
-	int* meancost;		/* mean of the cost of the population	*/
+	float* meancost;		/* mean of the cost of the population	*/
 	int* stdcost;		/* std of the cost of the population	*/
 	int* sbest;			/* current best solution				*/
 } record_t;
 
-record_t* alloc_record(params_t* params);
-free_record(record_t* r);
+record_t* alloc_record(param_t* params);
+void free_record(record_t* records, param_t* params);
 void recorder(param_t* params, int* max_fitness, int** offspring, record_t* records);
 
 #endif /* RECORD_H */
