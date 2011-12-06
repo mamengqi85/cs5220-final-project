@@ -7,7 +7,7 @@
 
 int main()
 {
-	int testing = 5;
+	int testing = 2;
 	int i, j;
 	srand((int)time(0));
 	if (testing == 0) {

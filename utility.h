@@ -6,6 +6,8 @@
 //generate an integer from [a, b]
 int rnd(int a, int b);
 
+//generate a float from [0, 1]
+float rndf();
 
 //given n, return a permutation of 0:n-1 in random order
 int* randperm(int n);
@@ -24,4 +26,6 @@ int* sort(int* array, int size);
 void print_matrix(int** matrix, int row, int col, char* fname);
 void print_matrixf(float** matrix, int row, int col, char* fname);
 
+//output the population, fitness, and cumulated selection rate to a specific file
+void print_population(int** population, int* fitness, int row, int col, char* fname);
 #endif /* UTILITY */

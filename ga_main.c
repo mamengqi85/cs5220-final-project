@@ -22,7 +22,7 @@ void read_data(param_t* params)
 	line = (char *) malloc (n_bytes + 1);
 
 	for (i = 0; i < params->n_clauses; ++i) {
-		read_state = getline (&line, &n_bytes, fin);
+		read_state = getline (&line, (size_t* restrict) &n_bytes, fin);
 		p = line;
 		for (j = 0; j < params->n_sat; ++j) {
 			//long a = strtol(p, &p, 10);
@@ -95,6 +95,10 @@ int main(int argc, char** argv)
 		for (j = 0; j < params->len; ++j) {
 			sbest_set[i][j] = records->sbest[j];
 		}
+		//print_matrix(&(records->allcost), 1, params->popsize * params->maxGen, "allcost.txt");
+		//print_matrix(&(records->bestcost), 1, params->maxGen, "bestcost.txt");
+		//print_matrixf(&(records->meancost), 1, params->maxGen, "meancost.txt");
+		//print_matrix(&(records->sbest), 1, params->len, "sbest.txt");
 	}
 
 	//record results

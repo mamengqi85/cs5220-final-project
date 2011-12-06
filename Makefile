@@ -7,24 +7,30 @@ CFLAGS=-Wall -g -std=gnu99 -O3
 
 # === Executables
 
-exe: test_utility.x ga.x
+exe: test_utility.x try_gen_operations.x ga.x
 
-ga.x: ga_main.c ga.o params.o record.o utility.o
+ga.x: ga_main.c ga.o params.o record.o utility.o genetic_operations.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 test_utility.x: test_utility.c utility.o params.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-ga.o: ga.c ga.h genetic_operations.h params.h record.h utility.h
+try_gen_operations.x: try_gen_operations.c utility.o params.o record.o genetic_operations.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+ga.o: ga.c ga.h params.h record.h utility.h genetic_operations.h
 	$(CC) $(CFLAGS) $^ -c $@
 
 params.o: params.c params.h
 	$(CC) -c $(CFLAGS) $< 
 
-record.o: record.c record.h params.h
+record.o: record.c record.h params.h utility.h
 	$(CC) -c $(CFLAGS) $< 
 
 utility.o: utility.c utility.h params.h
+	$(CC) -c $(CFLAGS) $< 
+
+genetic_operations.o: genetic_operations.c genetic_operations.h params.h utility.h
 	$(CC) -c $(CFLAGS) $< 
 
 %.o: %.c

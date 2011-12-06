@@ -3,15 +3,17 @@
 
 #include "params.h"
 
-void selection_r(param_t* params, int** parent, int* fitness, int** parentNew){}
+int fitnessSAT(param_t* params, int* individual);
+
+void selection_r(param_t* params, int** parent, int* fitness, int** offspring);
 	
-void crossover(param_t* params, float pCrossover, int** parentNew, int** offspring){}
+void crossover(param_t* params, float pCrossover, int** offspring);
 
-void mutation(param_t* params, float pMutation, int** offspring){}
+void mutation(param_t* params, float pMutation, int** offspring);
 
-void evaluation(param_t* params, int** offspring, int* fitness){}
+void evaluation(param_t* params, int** offspring, int* fitness);
 
-void elitism(param_t* params, int elitesize, int** parent, int* fitness, int** offspring){}
+void elitism(param_t* params, int elitesize, int** parent, int* fitness, int*p_fitness, int** offspring);
 
 #endif /* GENETIC_OPERATION_H */
 

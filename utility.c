@@ -11,6 +11,11 @@ int rnd(int a, int b)
 	return ans;
 }
 
+float rndf()
+{
+	return (float)rand()/RAND_MAX;
+}
+
 int* randperm(int n)
 {
 	int* perm = (int*) calloc(n, sizeof(int));
@@ -146,3 +151,34 @@ void print_matrixf(float** matrix, int row, int col, char* fname)
 	}
 	fclose(fp);
 }
+
+void print_population(int** population, int* fitness, int row, int col, char* fname)
+{
+	FILE* fp = fopen(fname, "w");
+	int i, j;
+
+	int base = min(fitness, row) - 1;
+	int* trans = (int*) calloc(row, sizeof(int));
+	for (i = 0; i < row; ++i) {
+		trans[i] = fitness[i] - base;
+	}
+	float sum = 0.0;
+	float* selection_rate = (float*) calloc(row, sizeof(float));
+	for (i = 0; i < row; ++i) {
+		sum += trans[i];
+		selection_rate[i] = sum;
+	}
+	for (i = 0; i < row; ++i) {
+		selection_rate[i] = selection_rate[i] / sum;
+	}
+
+	for (i = 0; i < row; ++i) {
+		for (j = 0; j < col; ++j) {
+			fprintf(fp, "%d\t", population[i][j]);
+		}
+		fprintf(fp, "%d\t%f\n", fitness[i], selection_rate[i]);
+	}
+	fclose(fp);
+}
+
+

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include "ga.h"
 #include "genetic_operations.h"
@@ -9,35 +10,56 @@
 
 void ga(param_t* params, int** Xinitial, record_t* records)
 {
-	int row = params->popsize;
-
-	int* fitness = (int*) calloc(row, sizeof(int));
-	int** parent = Xinitial;
+	int i, j;
+	int* fitness = (int*) calloc(params->popsize, sizeof(int));
+	int* p_fitness = (int*) calloc(params->popsize, sizeof(int));
+	int** parent = (int**) calloc(params->popsize, sizeof(int*));
+	for (i = 0; i < params->popsize; ++i) {
+		parent[i] = (int*) calloc(params->len, sizeof(int));
+		for (j = 0; j < params->len; ++j) {
+			parent[i][j] = Xinitial[i][j];
+		}
+	}
 	evaluation(params, parent, fitness);
+	int* order = sort(fitness, params->popsize);
+	reorder(params, parent, order);
+	memcpy(p_fitness, fitness, params->popsize * sizeof(int));
 	int max_fitness = 0;
-	records = alloc_record(params);
 	srand((int)time(0));
 	float dc = (params->pCrossover_s - params->pCrossover_e) / params->maxGen;
 	float dm = (params->pMutation_s - params->pMutation_e) / params->maxGen;
-	float de = (params->elitesize_e - params->elitesize_s) / params->maxGen;
+	float de = (params->elitesize_e - params->elitesize_s) / (float) params->maxGen;
 
-	int i;
+	int** offspring = (int**) calloc(params->popsize, sizeof(int*));
+	for (i = 0; i < params->popsize; ++i) {
+		offspring[i] = (int*) calloc(params->len, sizeof(int));
+	}
+
 	for (i = 0; i < params->maxGen; ++i) {
 		float pCrossover = params->pCrossover_s - dc * i;
 		float pMutation = params->pMutation_s - dm * i;
-		float elitesize = params->pCrossover_s - de * i;
-		int** parentNew;
-		int** offspring;
+		int elitesize = (int)(params->elitesize_s + de * i);
 
-		selection_r(params, parent, fitness, parentNew);
-		crossover(params, pCrossover, parentNew, offspring);
+		selection_r(params, parent, fitness, offspring);
+		crossover(params, pCrossover, offspring);
 		mutation(params, pMutation, offspring);
 		evaluation(params, offspring, fitness);
-		elitism(params, elitesize, parent, fitness, offspring);
-		recorder(params, &max_fitness, offspring, records);
+
 		int* order = sort(fitness, params->popsize);
 		reorder(params, offspring, order);
 
-		parent = offspring;
+		//print_population(offspring, fitness, params->popsize, params->len, "population.txt");
+		elitism(params, elitesize, parent, fitness, p_fitness, offspring);
+		
+		order = sort(fitness, params->popsize);
+		reorder(params, offspring, order);
+		recorder(params, i, &max_fitness, offspring, fitness, records);
+
+		for (j = 0; j < params->popsize; ++j) {
+			memcpy(parent[j], offspring[j], params->len * sizeof(int));
+		}
+		memcpy(p_fitness, fitness, params->popsize * sizeof(int));
+		//print_population(parent, p_fitness, params->popsize, params->len, "father.txt");
+		//print_population(offspring, fitness, params->popsize, params->len, "offspring.txt");
 	}
 }

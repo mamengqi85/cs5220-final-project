@@ -54,7 +54,7 @@ static void default_params(param_t* params)
 	params->pMutation_e	= 0.0001;
 	params->elitesize_s	= 1;
 	params->elitesize_e	= 15;
-	params->ord = 1;
+	params->ord = 3;
 
 }
 
