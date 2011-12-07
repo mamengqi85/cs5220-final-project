@@ -11,7 +11,7 @@ void crossover(param_t* params, float pCrossover, int** offspring);
 
 void mutation(param_t* params, float pMutation, int** offspring);
 
-void evaluation(param_t* params, int** offspring, int* fitness);
+void evaluation(param_t* params, int** offspring, int* fitness, int rank, int size);
 
 void elitism(param_t* params, int elitesize, int** parent, int* fitness, int*p_fitness, int** offspring);
 

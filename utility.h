@@ -22,9 +22,14 @@ float mean(int* array, int size);
 //sort the array by ascending order. return the original index after sorted.
 int* sort(int* array, int size);
 
+//transfer between 2D and 1D
+int* de_d(int** matrix, int row, int col);
+int** in_d(int* matrix, int rwo, int col);
+
 //output the matrix to a specific file
 void print_matrix(int** matrix, int row, int col, char* fname);
 void print_matrixf(float** matrix, int row, int col, char* fname);
+void print_1d(int* matrix, int row, int col, char* fname);
 
 //output the population, fitness, and cumulated selection rate to a specific file
 void print_population(int** population, int* fitness, int row, int col, char* fname);

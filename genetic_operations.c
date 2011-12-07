@@ -168,12 +168,20 @@ void mutation(param_t* params, float pMutation, int** offspring)
 	}
 }
 		
-void evaluation(param_t* params, int** offspring, int* fitness)
+void evaluation(param_t* params, int** offspring, int* fitness, int rank, int size)
 {
-	int i;
-	for (i = 0; i < params->popsize; ++i) {
-		fitness[i] = fitnessSAT(params, offspring[i]);
+	int row = params->popsize / size + 1;
+	if (rank == size - 1) {
+		row = params->popsize - row * (size - 1);
 	}
+	int i;
+	for (i = 0; i < row; ++i) {
+		fitness[i] = fitnessSAT(params, offspring[i]);
+		if (DEBUG == 0)
+			printf("%d %d;", i, fitness[i]);
+	}
+	if (DEBUG == 0)
+		printf("\n");
 }
 
 void elitism(param_t* params, int elitesize, int** parent, int* fitness, int* p_fitness, int** offspring)

@@ -3,7 +3,7 @@
 #$ -cwd
 #$ -j y
 #$ -S /bin/bash
-#$ -pe orte 8 
+#$ -pe orte 1 
 #
 
-/opt/openmpi/bin/mpirun -np $NSLOTS ./ga.x -g 500
+/opt/openmpi/bin/mpirun -np $NSLOTS ./ga.x -g 50 > screen.out

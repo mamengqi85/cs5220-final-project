@@ -83,9 +83,30 @@ int main(int argc, char** argv)
 		sbest_set[i] = (int*) calloc(params->len, sizeof(int));
 	}
 
+    // Initialize MPI and get rank and size
+	int rank, size, real_size;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+	real_size = size;
+	if (params->popsize % size != 0) {
+		int row = params->popsize / size + 1;
+		if (params->popsize % row !=0) {
+			size = params->popsize / row + 1;
+		} else {
+			size = params->popsize / row;
+		}
+	}
+	printf("current size = %d\n", size);
+
 	//perform GA
+	double t0_all = MPI_Wtime();
 	for (i = 0; i < params->trials; ++i) {
-		ga(params, Xinitials[i], records);
+		double t0 = MPI_Wtime();
+		ga(params, Xinitials[i], records, rank, size, real_size);
+		double t1 = MPI_Wtime();
+if(rank == size -1)
+		printf("trial %d: time %f\n", i, t1 - t0);
 		for (j = 0; j < params->popsize * params->maxGen; ++j) {
 			allcost_set[i][j] = records->allcost[j];
 		}
@@ -100,6 +121,10 @@ int main(int argc, char** argv)
 		//print_matrix(&(records->bestcost), 1, params->maxGen, "bestcost.txt");
 		//print_matrixf(&(records->meancost), 1, params->maxGen, "meancost.txt");
 		//print_matrix(&(records->sbest), 1, params->len, "sbest.txt");
+	}
+	double t1_all = MPI_Wtime();
+	if (rank == 0) {
+		printf("alltime time %f\n", t1_all - t0_all);
 	}
 
 	//record results
@@ -144,4 +169,5 @@ int main(int argc, char** argv)
 
 	free_record(records, params);
 	free_param(params);
+	MPI_Finalize();
 }

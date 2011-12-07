@@ -10,7 +10,7 @@ CFLAGS=-Wall -g -std=gnu99 -O3
 exe: test_utility.x try_gen_operations.x ga.x
 
 ga.x: ga_main.c ga.o params.o record.o utility.o genetic_operations.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(MPICC) $(CFLAGS) $^ -o $@
 
 test_utility.x: test_utility.c utility.o params.o
 	$(CC) $(CFLAGS) $^ -o $@
@@ -19,7 +19,7 @@ try_gen_operations.x: try_gen_operations.c utility.o params.o record.o genetic_o
 	$(CC) $(CFLAGS) $^ -o $@
 
 ga.o: ga.c ga.h params.h record.h utility.h genetic_operations.h
-	$(CC) $(CFLAGS) $^ -c $@
+	$(MPICC) $(CFLAGS) $^ -c $@
 
 params.o: params.c params.h
 	$(CC) -c $(CFLAGS) $< 
@@ -44,3 +44,15 @@ clean:
 realclean: clean
 	rm -f *.x
 
+clean_all:
+	rm -f *.qsub.o*
+	rm -f *.qsub.po*
+	rm -f *.o 
+	rm -f *.x
+	rm -f main.aux main.log main.out
+
+run: ga.x
+	rm -f *.qsub.o*
+	rm -f *.qsub.po*
+	rm -f core.*
+	qsub run-global.qsub
