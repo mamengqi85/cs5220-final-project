@@ -25,10 +25,10 @@ ordinary = 3;
 cmd = sprintf('./ga.x -t %d -p %d -g %d -n %d -C %d -c %d -M %d -m %d -E %d -e %d -o %d', ...,
     trials, popsize, maxGen, nCrossover, pCrossover_s, pCrossover_e, ...,
     pMutation_s, pMutation_e, elitesize_s, elitesize_e, ordinary)
-eval(cmd);
+%eval(cmd);
 fittests = load('../result/fittest_03.txt');
-plot((1:50) * 20, fittests, 'b-')
+plot((1:500) * 20, fittests, 'b-')
 legend('GA');
-xlabels('function evaluations');
-ylabels('average cost over all trials');
+xlabel('function evaluations');
+ylabel('average cost over all trials');
 title('Genetic Algorithm performence');

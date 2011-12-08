@@ -7,7 +7,8 @@
 
 int main()
 {
-	int testing = 2;
+	//max = 6
+	int testing = 6;
 	int i, j;
 	srand((int)time(0));
 	if (testing == 0) {
@@ -116,6 +117,14 @@ int main()
 		printf("min: %d\n", min(array, 5));
 		printf("max: %d\n", max(array, 5));
 		printf("mean: %f\n", mean(array, 5));
+	}
+
+	if (testing == 6)
+	{
+		int* new_a = de_d(array, 5, 2);
+		print_matrix(&new_a, 1, 10, "1d.txt");
+		int** newnew_a = in_d(new_a, 5, 2);
+		print_matrix(newnew_a, 5, 2, "2d.txt");
 	}
 		
 	return 0;

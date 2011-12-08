@@ -45,7 +45,7 @@ static void default_params(param_t* params)
 {
 	params->trials		= 30;
 	params->len			= 200;
-	params->popsize		= 20;
+	params->popsize		= 10;
 	params->maxGen		= 50;
 	params->nCrossover	= 1;
 	params->pCrossover_s	= 1;
@@ -53,9 +53,15 @@ static void default_params(param_t* params)
 	params->pMutation_s	= 0.02;
 	params->pMutation_e	= 0.0001;
 	params->elitesize_s	= 1;
-	params->elitesize_e	= 15;
+	params->elitesize_e	= 5;
 	params->ord = 3;
+	params->deme = 5;
+	params->freq = 5;
+	params->alien = 3;
+}
 
+static void validate(param_t* params)
+{
 }
 
 static void set_io(param_t* params)
@@ -87,17 +93,21 @@ static void print_usage()
 			"\t-m: probability of mutation at the end (%g)\n"
 			"\t-E: size of elites to bring to next generation at the beginning (%d)\n"
 			"\t-e: size of elites to bring to next generation at the end (%d)\n"
-			"\t-o: ordinary of the input clauses file (%d)\n",
+			"\t-o: ordinary of the input clauses file (%d)\n"
+			"\t-d: number of subpopulations (%d)\n"
+			"\t-f: frequence of merge (%d)\n"
+			"\t-a: number of individuals that taken from a neighbor"
+					"in each communication (%d)\n",
 			params.trials, params.popsize, params.maxGen, params.nCrossover,
 			params.pCrossover_s, params.pCrossover_e, params.pMutation_s, 
 			params.pMutation_e, params.elitesize_s, params.elitesize_e,
-			params.ord);
+			params.ord, params.deme, params.freq, params.alien);
 }
 
 int set_params(int argc, char** argv, param_t* params)
 {
     extern char* optarg;
-    const char* optstring = "ht:p:g:n:C:c:M:m:E:e:o:";
+    const char* optstring = "ht:p:g:n:C:c:M:m:E:e:o:d:f:a";
     int c;
 
     #define get_int_arg(c, field) \
@@ -113,21 +123,25 @@ int set_params(int argc, char** argv, param_t* params)
             return -1;
         get_int_arg('t', trials);
         get_int_arg('p', popsize);
-        get_flt_arg('g', maxGen);
-        get_flt_arg('n', nCrossover);
+        get_int_arg('g', maxGen);
+        get_int_arg('n', nCrossover);
         get_flt_arg('C', pCrossover_s);
         get_flt_arg('c', pCrossover_e);
         get_flt_arg('M', pMutation_s);
         get_flt_arg('m', pMutation_e);
-        get_flt_arg('E', elitesize_s);
-        get_flt_arg('e', elitesize_e);
-        get_flt_arg('o', ord);
+        get_int_arg('E', elitesize_s);
+        get_int_arg('e', elitesize_e);
+        get_int_arg('o', ord);
+		get_int_arg('d', deme);
+		get_int_arg('f', freq);
+		get_int_arg('a', alien);
         default:
             fprintf(stderr, "Unknown option\n");
             return -1;
         }
     }
 
+	validate(params);
     set_io(params);
     return 0;
 }

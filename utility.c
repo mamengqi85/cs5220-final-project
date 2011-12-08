@@ -42,7 +42,9 @@ void reorder(param_t* params, int** offspring, int* order)
 			tmp[i][j] = offspring[order[i]][j];
 		}
 	}
-	memcpy(offspring, tmp, params->popsize * params->len * sizeof(int));
+	for (i = 0; i < params->popsize; ++i) {
+		memcpy(offspring[i], tmp[i], params->len * sizeof(int));
+	}
 	free(tmp);
 }
 
@@ -126,6 +128,32 @@ int* sort(int* array, int size)
 	return order;
 }
 
+int* de_d(int** matrix, int row, int col)
+{
+	int i, j;
+	int* new_mat = (int*) calloc(row * col, sizeof(int));
+	for (i = 0; i < row; ++i) {
+		for (j = 0; j < col; ++j) {
+			new_mat[i * col + j] = matrix[i][j];
+		}
+	}
+
+	return new_mat;
+}
+
+int** in_d(int* matrix, int row, int col)
+{
+	int i, j;
+	int** new_mat = (int**) calloc(row, sizeof(int*));
+	for (i = 0; i < row; ++i) {
+		new_mat[i] = (int*) calloc(col, sizeof(int));
+		for (j = 0; j < col; ++j) {
+			new_mat[i][j] = matrix[i * col + j];
+		}
+	}
+	return new_mat;
+}
+
 void print_matrix(int** matrix, int row, int col, char* fname)
 {
 	FILE* fp = fopen(fname, "w");
@@ -150,6 +178,12 @@ void print_matrixf(float** matrix, int row, int col, char* fname)
 		fprintf(fp, "\n");
 	}
 	fclose(fp);
+}
+
+void print_1d(int* matrix, int row, int col, char* fname)
+{
+	int** new_mat = in_d(matrix, row, col);
+	print_matrix(new_mat, row, col, fname);
 }
 
 void print_population(int** population, int* fitness, int row, int col, char* fname)
@@ -180,5 +214,3 @@ void print_population(int** population, int* fitness, int row, int col, char* fn
 	}
 	fclose(fp);
 }
-
-

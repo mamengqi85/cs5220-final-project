@@ -4,7 +4,7 @@
 typedef struct param_t {
 	int trials;			/* number of trials to run					*/
 	int len;			/* length of the decision variables			*/
-	int popsize;		/* number of individuals in each generation	*/
+	int popsize;		/* number of individuals in each sub-group	*/
 	int maxGen;			/* number of generations					*/
 	int nCrossover;		/* number of crossover points				*/
 	float pCrossover_s;	/* starting probability of crossover		*/
@@ -14,6 +14,9 @@ typedef struct param_t {
 	int elitesize_s;	/* starting number of elites				*/
 	int elitesize_e;	/* ending number of elites					*/
 	int ord;			/* ordinary of the test set					*/
+	int deme;			/* number of subpopulations					*/
+	int freq;			/* frequence of merge						*/
+	int alien;			/* number of aliens in each communication	*/
 
 	int** clauses;		/* clauses to satisfy						*/
 	int n_sat;			/* number of decision valuables in a clause	*/
