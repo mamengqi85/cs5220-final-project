@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "ga.h"
 #include "params.h"
 #include "record.h"
@@ -42,6 +43,7 @@ int main(int argc, char** argv)
 	record_t* records = alloc_record(params);
 
 	//generate initial solutions for all trials
+	srand((int)time(0));
 	int*** Xinitials = (int***) calloc(params->trials, sizeof(int**));
 	int i, j, k;
 	for (i = 0; i < params->trials; ++i) {
