@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <mpi.h>
 #include "ga.h"
 #include "params.h"
@@ -43,6 +44,7 @@ int main(int argc, char** argv)
 	record_t* records = alloc_record(params);
 
 	//generate initial solutions for all trials
+	srand((int)time(0));
 	int*** Xinitials = (int***) calloc(params->trials, sizeof(int**));
 	int i, j, k;
 	for (i = 0; i < params->trials; ++i) {
@@ -97,7 +99,6 @@ int main(int argc, char** argv)
 			size = params->popsize / row;
 		}
 	}
-	printf("current size = %d\n", size);
 
 	//perform GA
 	double t0_all = MPI_Wtime();
@@ -123,49 +124,50 @@ if(rank == size -1)
 		//print_matrix(&(records->sbest), 1, params->len, "sbest.txt");
 	}
 	double t1_all = MPI_Wtime();
-	if (rank == 0) {
+	if (rank == size - 1) {
 		printf("alltime time %f\n", t1_all - t0_all);
-	}
+	
 
-	//record results
-	float* fittest = (float*) calloc(params->maxGen, sizeof(float));
-	int minhit = 0;
-	int* last_gen_best_costs = (int*) calloc(params->trials, sizeof(int));
-	for (i = 0; i < params->trials; ++i)
-		last_gen_best_costs[i] = bestcost_set[i][params->maxGen - 1];
-	float minavg = mean(last_gen_best_costs, params->trials);
-	int minf = min(last_gen_best_costs, params->trials);
-	int* best_sol;
+		//record results
+		float* fittest = (float*) calloc(params->maxGen, sizeof(float));
+		int minhit = 0;
+		int* last_gen_best_costs = (int*) calloc(params->trials, sizeof(int));
+		for (i = 0; i < params->trials; ++i)
+			last_gen_best_costs[i] = bestcost_set[i][params->maxGen - 1];
+		float minavg = mean(last_gen_best_costs, params->trials);
+		int minf = min(last_gen_best_costs, params->trials);
+		int* best_sol;
 
-	for (i = 0; i < params->maxGen; ++i) {
-		for (j = 0; j < params->trials; ++j) {
-			fittest[i] += bestcost_set[j][i];
-			if (i == params->maxGen - 1) {
-				if (bestcost_set[j][i] == minf) {
-					++minhit;
-					best_sol = sbest_set[j];
+		for (i = 0; i < params->maxGen; ++i) {
+			for (j = 0; j < params->trials; ++j) {
+				fittest[i] += bestcost_set[j][i];
+				if (i == params->maxGen - 1) {
+					if (bestcost_set[j][i] == minf) {
+						++minhit;
+						best_sol = sbest_set[j];
+					}
 				}
 			}
+			fittest[i] /= params->trials;
 		}
-		fittest[i] /= params->trials;
-	}
 
-	printf("minavg = %f\n", minavg);
-	printf("minf = %d\n", minf);
-	printf("minhit = %d\n", minhit);
+		printf("minavg = %f\n", minavg);
+		printf("minf = %d\n", minf);
+		printf("minhit = %d\n", minhit);
 
-	print_matrix(&last_gen_best_costs, 1, params->trials, params->out_best_cost);
-	float* avgCost = (float*) calloc(params->popsize * params->maxGen, sizeof(float));
-	for (i = 0; i < params->popsize * params-> maxGen; ++i) {
-		for (j = 0; j < params->trials; ++j) {
-			avgCost[i] += allcost_set[j][i];
+		print_matrix(&last_gen_best_costs, 1, params->trials, params->out_best_cost);
+		float* avgCost = (float*) calloc(params->popsize * params->maxGen, sizeof(float));
+		for (i = 0; i < params->popsize * params-> maxGen; ++i) {
+			for (j = 0; j < params->trials; ++j) {
+				avgCost[i] += allcost_set[j][i];
+			}
+			avgCost[i] /= params->trials;
 		}
-		avgCost[i] /= params->trials;
-	}
-	print_matrixf(&avgCost, 1, params->popsize * params->maxGen, params->out_avg_fun_eval);
+		print_matrixf(&avgCost, 1, params->popsize * params->maxGen, params->out_avg_fun_eval);
 
-	print_matrix(&best_sol, 1, params->len, params->out_best_sol);
-	print_matrixf(&fittest, 1, params->maxGen, params->out_fittest);
+		print_matrix(&best_sol, 1, params->len, params->out_best_sol);
+		print_matrixf(&fittest, 1, params->maxGen, params->out_fittest);
+	}
 
 	free_record(records, params);
 	free_param(params);

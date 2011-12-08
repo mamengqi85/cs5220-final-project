@@ -113,15 +113,15 @@ int set_params(int argc, char** argv, param_t* params)
             return -1;
         get_int_arg('t', trials);
         get_int_arg('p', popsize);
-        get_flt_arg('g', maxGen);
-        get_flt_arg('n', nCrossover);
+        get_int_arg('g', maxGen);
+        get_int_arg('n', nCrossover);
         get_flt_arg('C', pCrossover_s);
         get_flt_arg('c', pCrossover_e);
         get_flt_arg('M', pMutation_s);
         get_flt_arg('m', pMutation_e);
-        get_flt_arg('E', elitesize_s);
-        get_flt_arg('e', elitesize_e);
-        get_flt_arg('o', ord);
+        get_int_arg('E', elitesize_s);
+        get_int_arg('e', elitesize_e);
+        get_int_arg('o', ord);
         default:
             fprintf(stderr, "Unknown option\n");
             return -1;
