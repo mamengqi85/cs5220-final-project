@@ -222,9 +222,9 @@ int main(int argc, char** argv)
 	}
 
 	if (rank == size - 1) {
-		printf("minavg = %f\n", minavg);
-		printf("minf = %d\n", minf);
-		printf("minhit = %d\n", minhit);
+		printf("Average best cost of last generations over all trials = %f\n", minavg);
+		printf("Minimum best cost of last generations over all trials = %d\n", minf);
+		printf("Number of trials where best cost is found = %d\n", minhit);
 
 		print_matrix(&last_gen_best_costs, 1, params->trials, params->out_best_cost);
 		float* avgCost = (float*) calloc(params->popsize * params->maxGen * params->deme, sizeof(float));
