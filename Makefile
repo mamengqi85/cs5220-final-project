@@ -55,4 +55,4 @@ run: ga.x
 	rm -f *.qsub.o*
 	rm -f *.qsub.po*
 	rm -f core.*
-	qsub run-global.qsub
+	qsub run-grain.qsub
