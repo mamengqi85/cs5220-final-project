@@ -141,15 +141,18 @@ void ga(param_t* params, int** Xinitial, record_t* records, int rank, int size)
 			MPI_Irecv(fitness_i, params->alien, MPI_INT,
 					sender, 0, MPI_COMM_WORLD, recv_req_f);
 */
-			MPI_Send(offspring_o, params->alien * params->len, MPI_INT,
+/*
+			MPI_Rsend(offspring_o, params->alien * params->len, MPI_INT,
 					receiver, 0, MPI_COMM_WORLD);
-			MPI_Send(fitness_o, params->alien, MPI_INT,
+			MPI_Rsend(fitness_o, params->alien, MPI_INT,
 					receiver, 1, MPI_COMM_WORLD);
 			MPI_Recv(offspring_i, params->alien * params->len, MPI_INT,
 					sender, 0, MPI_COMM_WORLD, NULL);
 			MPI_Recv(fitness_i, params->alien, MPI_INT,
 					sender, 1, MPI_COMM_WORLD, NULL);
-
+*/
+			MPI_Sendrecv(offspring_o, params->alien * params->len, MPI_INT, receiver, 0, offspring_i, params->alien * params->len, MPI_INT, sender, 0, MPI_COMM_WORLD, NULL);
+			MPI_Sendrecv(fitness_o, params->alien, MPI_INT, receiver, 0, fitness_i, params->alien, MPI_INT, sender, 0, MPI_COMM_WORLD, NULL);
 			for (j = 0; j < params->alien; ++j) {
 				for (k = 0; k < params->len; ++k) {
 					offspring[params->popsize - 1 - j][k] =	offspring_o[j * params->len + k];

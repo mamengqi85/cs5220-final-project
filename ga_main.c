@@ -117,8 +117,9 @@ void syn(param_t* params, record_t* records, int trial, int** allcost_set,
 int main(int argc, char** argv)
 {
 	param_t* params = alloc_param();
-	if (set_params(argc, argv, params) != 0)
+	if (set_params(argc, argv, params) != 0) {
 		exit(-1);
+	}
 	read_data(params);
 	//print_matrix(params->clauses, params->n_clauses, params->n_sat, "clauses.txt");
 
@@ -183,7 +184,9 @@ int main(int argc, char** argv)
 	for (i = 0; i < params->trials; ++i) {
 		double t0 = MPI_Wtime();
 		ga(params, Xinitials[i], records, rank, size);
+printf("%d before syn\n", i);
 		syn(params, records, i, allcost_set, bestcost_set, meancost_set, sbest_set, rank, size);
+printf("%d after syn\n", i);
 		double t1 = MPI_Wtime();
 	//print_matrix(&(records->allcost), 1, params->popsize * params->maxGen, "allcost.txt");
 		//print_matrix(&(records->bestcost), 1, params->maxGen, "bestcost.txt");

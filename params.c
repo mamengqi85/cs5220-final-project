@@ -63,11 +63,13 @@ static void default_params(param_t* params)
 
 static void validate(param_t* params)
 {
+printf("validate start\n");
     assert( params->trials >= 1 );
-    assert( params->popsize >= params->alien );
+    assert( params->popsize > 0);
     assert( params->popsize % 2 == 0 );
     assert( params->maxGen >= 1 );
     assert( params->nCrossover >= 1 && params->nCrossover <= (params->len - 1) );
+    assert( params->pCrossover_s >= 0 && params->pCrossover_s <= 1 );
     assert( params->pCrossover_e >= 0 && params->pCrossover_e <= 1 );
     assert( params->pMutation_s >= 0 && params->pMutation_s <= 1 );
     assert( params->pMutation_e >= 0 && params->pMutation_e <= 1 );
@@ -76,8 +78,10 @@ static void validate(param_t* params)
     assert( params->ord >= 1 && params->ord <= 9 );
     assert( params->deme >= 1 );
     assert( params->freq >= 1 && params->freq <= params->maxGen );
-    assert( params->alien >=0 && params->alien <= params->popsize );
+    assert( params->alien >= 0 && params->alien < params->popsize );
+    assert( params->alien + params->elitesize_s < params->popsize );
     assert( params->alien + params->elitesize_e < params->popsize );
+printf("validate end\n");
 }
 
 static void set_io(param_t* params)
@@ -123,20 +127,22 @@ static void print_usage()
 int set_params(int argc, char** argv, param_t* params)
 {
     extern char* optarg;
-    const char* optstring = "ht:p:g:n:C:c:M:m:E:e:o:d:f:a";
+    const char* optstring = "ht:p:g:n:C:c:M:m:E:e:o:d:f:a:";
     int c;
-
+printf("optstr\n");
     #define get_int_arg(c, field) \
         case c: params->field = atoi(optarg); break
     #define get_flt_arg(c, field) \
         case c: params->field = (float) atof(optarg); break
 
     default_params(params);
+printf("default param\n");
     while ((c = getopt(argc, argv, optstring)) != -1) {
         switch (c) {
         case 'h': 
             print_usage(); 
             return -1;
+printf("start get arg\n");
         get_int_arg('t', trials);
         get_int_arg('p', popsize);
         get_int_arg('g', maxGen);
@@ -148,9 +154,13 @@ int set_params(int argc, char** argv, param_t* params)
         get_int_arg('E', elitesize_s);
         get_int_arg('e', elitesize_e);
         get_int_arg('o', ord);
+printf("before get_int d\n");
         get_int_arg('d', deme);
+printf("get_int d\n");
         get_int_arg('f', freq);
+printf("before get_int a\n");
         get_int_arg('a', alien);
+printf("get_int a\n");
         default:
             fprintf(stderr, "Unknown option\n");
             return -1;
@@ -159,5 +169,6 @@ int set_params(int argc, char** argv, param_t* params)
 
 	validate(params);
     set_io(params);
+printf("end io\n");
     return 0;
 }
