@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -56,6 +57,22 @@ static void default_params(param_t* params)
 	params->elitesize_e	= 15;
 	params->ord = 3;
 
+}
+
+static void validate(param_t* params)
+{
+    assert( params->trials >= 1 );
+    assert( params->popsize > 0);
+    assert( params->popsize % 2 == 0 );
+    assert( params->maxGen >= 1 );
+    assert( params->nCrossover >= 1 && params->nCrossover <= (params->len - 1) );
+    assert( params->pCrossover_s >= 0 && params->pCrossover_s <= 1 );
+    assert( params->pCrossover_e >= 0 && params->pCrossover_e <= 1 );
+    assert( params->pMutation_s >= 0 && params->pMutation_s <= 1 );
+    assert( params->pMutation_e >= 0 && params->pMutation_e <= 1 );
+    assert( params->elitesize_s >= 0 && params->elitesize_s < params->popsize );
+    assert( params->elitesize_e >= 0 && params->elitesize_e < params->popsize );
+    assert( params->ord >= 1 && params->ord <= 9 );
 }
 
 static void set_io(param_t* params)
@@ -128,6 +145,7 @@ int set_params(int argc, char** argv, param_t* params)
         }
     }
 
+	validate(params);
     set_io(params);
     return 0;
 }
