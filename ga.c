@@ -108,9 +108,10 @@ void syn(param_t* params, int* fitness, int* sub_fitness, int rank, int size, in
 	free(sub_fitness);
 }
 
-void ga(param_t* params, int** Xinitial, record_t* records, int rank, int size, int real_size)
+void ga(param_t* params, int** Xinitial, record_t* records, int rank, int size, int real_size, double* t_eval, double* t_comm)
 {
 	int i, j;
+	double t0, t1, t2, t3;
 	int* fitness = (int*) calloc(params->popsize, sizeof(int));
 	int* p_fitness = (int*) calloc(params->popsize, sizeof(int));
 	int** parent = (int**) calloc(params->popsize, sizeof(int*));
@@ -121,10 +122,15 @@ void ga(param_t* params, int** Xinitial, record_t* records, int rank, int size, 
 		}
 	}
 
+	t0 = MPI_Wtime();
 	int* sub_offspring = dis(params, parent, rank, size, real_size);
+	t2 = MPI_Wtime();
 	int* sub_fitness = evaluation_g(params, sub_offspring, rank, size);
-	//MPI_Barrier(MPI_COMM_WORLD);
+	t3 = MPI_Wtime();
 	syn(params, fitness, sub_fitness, rank, size, real_size);
+	t1 = MPI_Wtime();
+	*t_eval = t1 - t0;
+	*t_comm = *t_eval - (t3 - t2);
 
 	int* order = sort(fitness, params->popsize);
 	reorder(params, parent, order);
@@ -141,8 +147,6 @@ void ga(param_t* params, int** Xinitial, record_t* records, int rank, int size, 
 	}
 
 	for (i = 0; i < params->maxGen; ++i) {
-		double t0_ga = MPI_Wtime();
-
 		float pCrossover = params->pCrossover_s - dc * i;
 		float pMutation = params->pMutation_s - dm * i;
 		int elitesize = (int)(params->elitesize_s + de * i);
@@ -153,14 +157,15 @@ void ga(param_t* params, int** Xinitial, record_t* records, int rank, int size, 
    	 		mutation(params, pMutation, offspring);
 		}
 
-		double t0 = MPI_Wtime();
+		t0 = MPI_Wtime();
 		sub_offspring = dis(params, offspring, rank, size, real_size);
+		t2 = MPI_Wtime();
 		sub_fitness = evaluation_g(params, sub_offspring, rank, size);
-		//MPI_Barrier(MPI_COMM_WORLD);
+		t3 = MPI_Wtime();
 		syn(params, fitness, sub_fitness, rank, size, real_size);
-		double t1 = MPI_Wtime();
-if(rank == size -1)
-		printf("eval time: %f\n", t1 - t0);
+		t1 = MPI_Wtime();
+		*t_eval = *t_eval + t1 - t0;
+		*t_comm = *t_comm + (t1 - t0) - (t3 - t2);
 
 		if (rank == size - 1) {
 			int* order = sort(fitness, params->popsize);
@@ -179,8 +184,5 @@ if(rank == size -1)
 		}
 //print_population(offspring, fitness, params->popsize, params->len, "end_population.txt");
 //print_population(parent, p_fitness, params->popsize, params->len, "end_father.txt");
-double t1_ga = MPI_Wtime();
-if(rank == size - 1)
-printf("ga alg time %f\n", t1_ga - t0_ga);
 	}
 }

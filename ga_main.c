@@ -100,14 +100,18 @@ int main(int argc, char** argv)
 		}
 	}
 
+	double t_all = 0, t_eval = 0, t_comm = 0, t_eval_tmp = 0, t_comm_tmp = 0;
 	//perform GA
-	double t0_all = MPI_Wtime();
 	for (i = 0; i < params->trials; ++i) {
 		double t0 = MPI_Wtime();
-		ga(params, Xinitials[i], records, rank, size, real_size);
+		ga(params, Xinitials[i], records, rank, size, real_size, &t_eval_tmp, &t_comm_tmp);
 		double t1 = MPI_Wtime();
-if(rank == size -1)
-		printf("trial %d: time %f\n", i, t1 - t0);
+		
+		if(rank == size -1) {
+			t_all += (t1 - t0);
+			t_eval += t_eval_tmp;
+			t_comm += t_comm_tmp;
+		}
 		for (j = 0; j < params->popsize * params->maxGen; ++j) {
 			allcost_set[i][j] = records->allcost[j];
 		}
@@ -118,15 +122,14 @@ if(rank == size -1)
 		for (j = 0; j < params->len; ++j) {
 			sbest_set[i][j] = records->sbest[j];
 		}
-		//print_matrix(&(records->allcost), 1, params->popsize * params->maxGen, "allcost.txt");
-		//print_matrix(&(records->bestcost), 1, params->maxGen, "bestcost.txt");
-		//print_matrixf(&(records->meancost), 1, params->maxGen, "meancost.txt");
-		//print_matrix(&(records->sbest), 1, params->len, "sbest.txt");
 	}
-	double t1_all = MPI_Wtime();
 	if (rank == size - 1) {
-		printf("alltime time %f\n", t1_all - t0_all);
-	
+		t_all /= params->trials;
+		t_eval /= params->trials;
+		t_comm /= params->trials;
+		printf("average GA time: %f\n", t_all);
+		printf("average evaluation time: %f\n", t_eval);
+		printf("average total communication time: %f\n", t_comm);
 
 		//record results
 		float* fittest = (float*) calloc(params->maxGen, sizeof(float));

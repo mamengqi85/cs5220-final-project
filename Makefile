@@ -9,17 +9,24 @@ CFLAGS=-Wall -g -std=gnu99 -O3
 
 exe: test_utility.x try_gen_operations.x ga.x
 
-ga.x: ga_main.c ga.o params.o record.o utility.o genetic_operations.o
+ga.x: ga_main.o ga.o params.o record.o utility.o genetic_operations.o
 	$(MPICC) $(CFLAGS) $^ -o $@
 
-test_utility.x: test_utility.c utility.o params.o
+ga_main.o: ga_main.c 
+#ga.o params.o record.o utility.o genetic_operations.o
+	$(MPICC) -c $(CFLAGS) $<
+
+test_utility.x: test_utility.o utility.o params.o
 	$(CC) $(CFLAGS) $^ -o $@
+
+test_utility.o: test_utility.c 
+	$(CC) -c $(CFLAGS) $<
 
 try_gen_operations.x: try_gen_operations.c utility.o params.o record.o genetic_operations.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 ga.o: ga.c ga.h params.h record.h utility.h genetic_operations.h
-	$(MPICC) $(CFLAGS) $^ -c $@
+	$(MPICC) -c $(CFLAGS) $< 
 
 params.o: params.c params.h
 	$(CC) -c $(CFLAGS) $< 
