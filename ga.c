@@ -41,8 +41,10 @@ void print_population_g(int** population, int* fitness, int row, int col, char* 
 	fclose(fp);
 }
 
-void ga(param_t* params, int** Xinitial, record_t* records, int rank, int size)
+void ga(param_t* params, int** Xinitial, record_t* records, int rank, int size, double* t_comm)
 {
+	double t0, t1;
+	*t_comm = 0;
 	int i, j, k;
 	int counter = 0;
 	int* fitness = (int*) calloc(params->popsize, sizeof(int));
@@ -114,6 +116,7 @@ void ga(param_t* params, int** Xinitial, record_t* records, int rank, int size)
 
 		++counter;
 		//communicate
+		t0 = MPI_Wtime();
 		if (counter == params->freq) {
 /*
 			if (!is_first) {
@@ -141,16 +144,6 @@ void ga(param_t* params, int** Xinitial, record_t* records, int rank, int size)
 			MPI_Irecv(fitness_i, params->alien, MPI_INT,
 					sender, 0, MPI_COMM_WORLD, recv_req_f);
 */
-/*
-			MPI_Rsend(offspring_o, params->alien * params->len, MPI_INT,
-					receiver, 0, MPI_COMM_WORLD);
-			MPI_Rsend(fitness_o, params->alien, MPI_INT,
-					receiver, 1, MPI_COMM_WORLD);
-			MPI_Recv(offspring_i, params->alien * params->len, MPI_INT,
-					sender, 0, MPI_COMM_WORLD, NULL);
-			MPI_Recv(fitness_i, params->alien, MPI_INT,
-					sender, 1, MPI_COMM_WORLD, NULL);
-*/
 			MPI_Sendrecv(offspring_o, params->alien * params->len, MPI_INT, receiver, 0, offspring_i, params->alien * params->len, MPI_INT, sender, 0, MPI_COMM_WORLD, NULL);
 			MPI_Sendrecv(fitness_o, params->alien, MPI_INT, receiver, 0, fitness_i, params->alien, MPI_INT, sender, 0, MPI_COMM_WORLD, NULL);
 			for (j = 0; j < params->alien; ++j) {
@@ -162,6 +155,8 @@ void ga(param_t* params, int** Xinitial, record_t* records, int rank, int size)
 
 			counter = 0;
 		}
+		t1 = MPI_Wtime();
+		*t_comm = *t_comm + (t1 - t0);
 
 		order = sort(fitness, params->popsize);
 		reorder(params, offspring, order);

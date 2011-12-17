@@ -63,7 +63,7 @@ void syn_entryf(float* entry, float* entry_buffer, int recv_count, int rank, int
 
 void syn(param_t* params, record_t* records, int trial, int** allcost_set, 
 		int** bestcost_set, float** meancost_set, int** sbest_set, 
-		int rank, int size)
+		int rank, int size, double* t_syn)
 {
 	int i, j, k;
 	int* allcost_buffer = (int*) calloc(params->popsize * params->maxGen * params->deme, sizeof(int));
@@ -71,10 +71,13 @@ void syn(param_t* params, record_t* records, int trial, int** allcost_set,
 	float* meancost_buffer = (float*) calloc(params->maxGen * params->deme, sizeof(float));
 	int* sbest_buffer = (int*) calloc(params->len * params->deme, sizeof(int));
 
+	double t0 = MPI_Wtime();
 	syn_entry(records->allcost, allcost_buffer, params->popsize * params->maxGen, rank, size);
 	syn_entry(records->bestcost, bestcost_buffer, params->maxGen, rank, size);
 	syn_entryf(records->meancost, meancost_buffer, params->maxGen, rank, size);
 	syn_entry(records->sbest, sbest_buffer, params->len, rank, size);
+	double t1 = MPI_Wtime();
+	*t_syn = t1 - t0;
 
 	for (i = 0; i < params->deme; ++i) {
 		for (j = 0; j < params->popsize * params->maxGen; ++j) {
@@ -179,26 +182,26 @@ int main(int argc, char** argv)
 		exit(1);
 	}
 
+	double t_all = 0, t_comm = 0, t_syn = 0, t_comm_tmp = 0, t_syn_tmp = 0;
 	//perform GA
-	double t0_all = MPI_Wtime();
 	for (i = 0; i < params->trials; ++i) {
 		double t0 = MPI_Wtime();
-		ga(params, Xinitials[i], records, rank, size);
-printf("%d before syn\n", i);
-		syn(params, records, i, allcost_set, bestcost_set, meancost_set, sbest_set, rank, size);
-printf("%d after syn\n", i);
+		ga(params, Xinitials[i], records, rank, size, &t_comm_tmp);
+		syn(params, records, i, allcost_set, bestcost_set, meancost_set, sbest_set, rank, size, &t_syn_tmp);
 		double t1 = MPI_Wtime();
-	//print_matrix(&(records->allcost), 1, params->popsize * params->maxGen, "allcost.txt");
-		//print_matrix(&(records->bestcost), 1, params->maxGen, "bestcost.txt");
-		//print_matrixf(&(records->meancost), 1, params->maxGen, "meancost.txt");
-		//print_matrix(&(records->sbest), 1, params->len, "sbest.txt");
 		if (rank == size - 1) {
-			printf("trial %d: time %f\n", i, t1 - t0);
+			t_all += t1 - t0;
+			t_comm += t_comm_tmp;
+			t_syn += t_syn_tmp;
 		}
 	}
-	double t1_all = MPI_Wtime();
 	if (rank == size - 1) {
-		printf("alltime time %f\n", t1_all - t0_all);
+		t_all /= params->trials;
+		t_comm /= params->trials;
+		t_syn /= params->trials;
+		printf("average all time: %f\n", t_all);
+		printf("average comm time: %f\n", t_comm);
+		printf("average syn time: %f\n", t_syn);
 	}
 
 	//record results
