@@ -6,11 +6,13 @@
 #include "genetic_operations.h"
 #include "params.h"
 #include "record.h"
+#include "time.h"
 #include "utility.h"
 
-void ga(param_t* params, int** Xinitial, record_t* records)
+void ga(param_t* params, int** Xinitial, record_t* records, double* t_eval, double* t_cm)
 {
 	int i, j;
+	clock_t t0, t1;
 	int* fitness = (int*) calloc(params->popsize, sizeof(int));
 	int* p_fitness = (int*) calloc(params->popsize, sizeof(int));
 	int** parent = (int**) calloc(params->popsize, sizeof(int*));
@@ -20,7 +22,11 @@ void ga(param_t* params, int** Xinitial, record_t* records)
 			parent[i][j] = Xinitial[i][j];
 		}
 	}
+	t0 = clock();
 	evaluation(params, parent, fitness);
+	t1 = clock();
+	*t_eval = (double) (t1 - t0) / CLOCKS_PER_SEC;
+	*t_cm = 0;
 	int* order = sort(fitness, params->popsize);
 	reorder(params, parent, order);
 	memcpy(p_fitness, fitness, params->popsize * sizeof(int));
@@ -41,9 +47,16 @@ void ga(param_t* params, int** Xinitial, record_t* records)
 		int elitesize = (int)(params->elitesize_s + de * i);
 
 		selection_r(params, parent, fitness, offspring);
+		t0 = clock();
 		crossover(params, pCrossover, offspring);
 		mutation(params, pMutation, offspring);
+		t1 = clock();
+		*t_cm = *t_cm + (double)(t1 - t0) / CLOCKS_PER_SEC;
+
+		t0 = clock();
 		evaluation(params, offspring, fitness);
+		t1 = clock();
+		*t_eval = *t_eval + (double) (t1 - t0) / CLOCKS_PER_SEC;
 
 		int* order = sort(fitness, params->popsize);
 		reorder(params, offspring, order);

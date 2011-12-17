@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+#$ -cwd
+#$ -j y
+#$ -S /bin/bash
+#
+
+#/share/apps/local/bin/gcc ./ga.x -g 500 > screen.out
+./ga.x -g 250 > screen.out
+exit 0

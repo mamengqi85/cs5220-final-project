@@ -84,9 +84,17 @@ int main(int argc, char** argv)
 		sbest_set[i] = (int*) calloc(params->len, sizeof(int));
 	}
 
+	double t_all = 0, t_eval = 0, t_cm = 0, t_eval_tmp = 0, t_cm_tmp = 0;
+	clock_t t0, t1;
+
 	//perform GA
 	for (i = 0; i < params->trials; ++i) {
-		ga(params, Xinitials[i], records);
+		t0 = clock();
+		ga(params, Xinitials[i], records, &t_eval_tmp, &t_cm_tmp);
+		t1 = clock();
+		t_all += (double) (t1 - t0) / CLOCKS_PER_SEC;
+		t_eval += t_eval_tmp;
+		t_cm += t_cm_tmp;
 		for (j = 0; j < params->popsize * params->maxGen; ++j) {
 			allcost_set[i][j] = records->allcost[j];
 		}
@@ -97,11 +105,13 @@ int main(int argc, char** argv)
 		for (j = 0; j < params->len; ++j) {
 			sbest_set[i][j] = records->sbest[j];
 		}
-		//print_matrix(&(records->allcost), 1, params->popsize * params->maxGen, "allcost.txt");
-		//print_matrix(&(records->bestcost), 1, params->maxGen, "bestcost.txt");
-		//print_matrixf(&(records->meancost), 1, params->maxGen, "meancost.txt");
-		//print_matrix(&(records->sbest), 1, params->len, "sbest.txt");
 	}
+	t_all /= params->trials;
+	t_eval /= params->trials;
+	t_cm /= params->trials;
+	printf("average GA time: %f\n", t_all);
+	printf("average evaluation time: %f\n", t_eval);
+	printf("average crossover+mutation time: %f\n", t_cm);
 
 	//record results
 	float* fittest = (float*) calloc(params->maxGen, sizeof(float));

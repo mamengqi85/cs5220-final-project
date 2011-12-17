@@ -44,3 +44,15 @@ clean:
 realclean: clean
 	rm -f *.x
 
+clean_all:
+	rm -f *.qsub.o*
+	rm -f *.qsub.po*
+	rm -f *.o
+	rm -f *.x
+	rm -f main.aux main.log main.out
+
+run: ga.x
+	rm -f *.qsub.o*
+	rm -f *.qusb.po*
+	rm -f core.*
+	qsub run-serial.qsub
