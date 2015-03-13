@@ -1,0 +1,1 @@
+parallelization of genetic algorithm
